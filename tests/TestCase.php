@@ -3,8 +3,8 @@
 namespace Mamitech\DatadogLaravelMetric\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Orchestra\Testbench\TestCase as Orchestra;
 use Mamitech\DatadogLaravelMetric\DatadogLaravelMetricServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
