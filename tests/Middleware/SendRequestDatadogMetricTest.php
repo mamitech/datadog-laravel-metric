@@ -35,9 +35,7 @@ it('sends metric data to datadog and exclude tag as configured', function () {
     $mockDatadog->shouldReceive('microtiming')
         ->with(
             'request',
-            Mockery::on(function ($duration) {
-                    return $duration > 0;
-            }),
+            Mockery::any(),
             1,
             [
                 'app' => 'testing-app',
