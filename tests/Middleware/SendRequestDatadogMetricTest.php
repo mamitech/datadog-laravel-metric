@@ -36,7 +36,7 @@ it('sends metric data to datadog and exclude tag as configured', function () {
         ->with(
             'request',
             Mockery::on(function ($duration) {
-                    return $duration > 0;
+                return $duration > 0;
             }),
             1,
             [
