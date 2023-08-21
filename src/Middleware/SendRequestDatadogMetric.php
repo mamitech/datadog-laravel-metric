@@ -14,11 +14,9 @@ class SendRequestDatadogMetric
     {
         $this->datadogLaravelMetric = $datadogLaravelMetric;
     }
-    
+
     /**
      * Handle an incoming request and measure request time and send to Datadog.
-     * @param Request $request
-     * @param Closure $next
      *
      * @return mixed
      */
@@ -28,11 +26,11 @@ class SendRequestDatadogMetric
         $metricStartTime = microtime(true);
         $response = $next($request);
         $duration = microtime(true) - $metricStartTime;
-        
+
         // tags get request controller name, action, and request method and status code
         $controller = $request->route()?->getAction()['controller'] ?? 'unknownController';
         $methodName = $request->route()?->getAction()['action'] ?? 'unknownMethod';
-        $action = $controller . '@' . $methodName;
+        $action = $controller.'@'.$methodName;
         $tags = [
             'app' => config('datadog-laravel-metric.tags.app'),
             'environment' => config('datadog-laravel-metric.tags.env'),
@@ -40,16 +38,17 @@ class SendRequestDatadogMetric
             'host' => $request->getHost(),
             'status_code' => null,
         ];
-        
+
         // exclude certain tags from being sent to datadog
         $excludeTags = config('datadog-laravel-metric.middleware.exclude_tags');
         foreach ($excludeTags as $excludeTag) {
             unset($tags[$excludeTag]);
         }
-        
+
         // send to Datadog
         $metricName = config('datadog-laravel-metric.middleware.metric_name');
         $this->datadogLaravelMetric->measure($metricName, $tags, $duration);
+
         return $response;
     }
 }

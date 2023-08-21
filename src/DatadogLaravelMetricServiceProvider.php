@@ -15,7 +15,6 @@ class DatadogLaravelMetricServiceProvider extends ServiceProvider
             __DIR__.'/../config/datadog-laravel-metric.php' => config_path('datadog-laravel-metric.php'),
         ]);
 
-        
         $kernel = $application->make(Kernel::class);
         $kernel->prependMiddleware(SendRequestDatadogMetric::class);
     }
@@ -25,7 +24,7 @@ class DatadogLaravelMetricServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             __DIR__.'/../config/datadog-laravel-metric.php', 'datadog-laravel-metric'
         );
-        
+
         $this->app->singleton(DatadogLaravelMetric::class, function () {
             return DatadogLaravelMetric::initFromConfig();
         });

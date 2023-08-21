@@ -8,7 +8,7 @@ use Mamitech\DatadogLaravelMetric\Middleware\SendRequestDatadogMetric;
 
 it('sends metric data to datadog when enabled', function () {
     config(['datadog-laravel-metric.enabled' => true]);
-    
+
     $mockDatadog = Mockery::mock(DogStatsd::class);
     $mockDatadog->shouldReceive('microtiming')->once();
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
@@ -38,6 +38,7 @@ it('sends metric data to datadog and exclude tag as configured', function () {
             Mockery::on(
                 function ($duration) {
                     expect($duration > 0)->toBeTrue();
+
                     return true;
                 }
             ),
@@ -66,7 +67,7 @@ it('sends metric data to datadog and exclude tag as configured', function () {
 
 it('does not send metric data to datadog when disabled', function () {
     config(['datadog-laravel-metric.enabled' => false]);
-    
+
     $mockDatadog = Mockery::mock(DogStatsd::class);
     $mockDatadog->shouldNotReceive('microtiming');
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);

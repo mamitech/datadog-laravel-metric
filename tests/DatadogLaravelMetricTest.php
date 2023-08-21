@@ -1,18 +1,15 @@
 <?php
 
 use DataDog\DogStatsd;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Mamitech\DatadogLaravelMetric\DatadogLaravelMetric;
-use Mamitech\DatadogLaravelMetric\Middleware\SendRequestDatadogMetric;
 
 test('measureFunc', function () {
     config(['datadog-laravel-metric.enabled' => true]);
-    
+
     $mockDatadog = Mockery::mock(DogStatsd::class);
     $mockDatadog->shouldReceive('microtiming')->once();
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
-    
+
     $func = function () {
         return 'hello i am measureFunc';
     };
@@ -24,11 +21,11 @@ test('measureFunc', function () {
 
 test('measure', function () {
     config(['datadog-laravel-metric.enabled' => true]);
-    
+
     $mockDatadog = Mockery::mock(DogStatsd::class);
     $mockDatadog->shouldReceive('microtiming')->once();
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
-    
+
     $func = function () {
         return 'hello this is testing for measure';
     };

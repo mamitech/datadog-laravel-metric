@@ -2,8 +2,8 @@
 
 namespace Mamitech\DatadogLaravelMetric;
 
-use DataDog\DogStatsd;
 use Closure;
+use DataDog\DogStatsd;
 
 class DatadogLaravelMetric extends DogStatsd
 {
@@ -14,19 +14,20 @@ class DatadogLaravelMetric extends DogStatsd
         $this->dogstatsd = $dogStatsd;
     }
 
-    public static function initFromConfig(): DatadogLaravelMetric {
+    public static function initFromConfig(): DatadogLaravelMetric
+    {
         $config = config('datadog-laravel-metric.init_config');
-        
+
         return new DatadogLaravelMetric(new DogStatsd($config));
     }
 
     /**
      * Measure the execution time of a function and send it to Datadog.
      *
-     * @param string $metricName - The name of the metric to send to Datadog.
-     * @param array $tags - The tags to send to Datadog.
-     * @param Closure $func - The function to execute.
-     * @param int $sampling - The sampling rate to send to Datadog.
+     * @param  string  $metricName - The name of the metric to send to Datadog.
+     * @param  array  $tags - The tags to send to Datadog.
+     * @param  Closure  $func - The function to execute.
+     * @param  int  $sampling - The sampling rate to send to Datadog.
      */
     public function measureFunc(string $metricName, array $tags, Closure $func, int $sampling = 1)
     {
@@ -34,7 +35,7 @@ class DatadogLaravelMetric extends DogStatsd
 
         $returnVal = $func();
 
-        if (!config('datadog-laravel-metric.enabled', false)) {
+        if (! config('datadog-laravel-metric.enabled', false)) {
             return $returnVal;
         }
 
@@ -56,15 +57,15 @@ class DatadogLaravelMetric extends DogStatsd
      *
      * This function is better if you need the tags based on result of that doing something.
      * Example: tag the success value of a function call.
-     * 
-     * @param string $metricName - The name of the metric to send to Datadog.
-     * @param float $duration - The duration to send to Datadog.
-     * @param array $tags - The tags to send to Datadog.
-     * @param int $sampling - The sampling rate to send to Datadog.
+     *
+     * @param  string  $metricName - The name of the metric to send to Datadog.
+     * @param  float  $duration - The duration to send to Datadog.
+     * @param  array  $tags - The tags to send to Datadog.
+     * @param  int  $sampling - The sampling rate to send to Datadog.
      */
     public function measure(string $metricName, array $tags, float $duration, int $sampling = 1)
     {
-        if (!config('datadog-laravel-metric.enabled', false)) {
+        if (! config('datadog-laravel-metric.enabled', false)) {
             return;
         }
         $this->dogstatsd->microtiming($metricName, $duration, $sampling, $tags);
