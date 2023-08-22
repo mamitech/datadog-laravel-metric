@@ -1,27 +1,26 @@
-# Collect Laravel's request histogram data and custom metric for Datadog
+# datadog-laravel-metric
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/mamitech/datadog-laravel-metric.svg?style=flat-square)](https://packagist.org/packages/mamitech/datadog-laravel-metric)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/mamitech/datadog-laravel-metric/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/mamitech/datadog-laravel-metric/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/mamitech/datadog-laravel-metric/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/mamitech/datadog-laravel-metric/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/mamitech/datadog-laravel-metric.svg?style=flat-square)](https://packagist.org/packages/mamitech/datadog-laravel-metric)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## TODO README
+Collect Laravel's request histogram data and custom metric for Datadog.
 
 ## Feature
 
 - Toggleable via env value
-- Laravel middleware integration (tagging by controller and action)
-- 
+- Laravel middleware integration. By default, it contains these tags
+    - app
+    - environment
+    - action
+    - host
+    - status_code
+- Any default Tags above can be disabled via config
 
-## Support us
+## Limitation
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/datadog-laravel-metric.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/datadog-laravel-metric)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+- For now it's only support DogstatsD histogram (microtiming)
 
 ## Installation
 
@@ -29,13 +28,6 @@ You can install the package via composer:
 
 ```bash
 composer require mamitech/datadog-laravel-metric
-```
-
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="datadog-laravel-metric-migrations"
-php artisan migrate
 ```
 
 You can publish the config file with:
@@ -47,17 +39,85 @@ php artisan vendor:publish --tag="datadog-laravel-metric-config"
 This is the contents of the published config file:
 
 ```php
+<?php
+
+// config for Mamitech/DatadogLaravelMetric
 return [
+    'enabled' => env('DATADOG_ENABLED', false),
+    'init_config' => [
+        'host' => env('DATADOG_HOST', 'localhost'),
+        'port' => env('DATADOG_PORT', 8125),
+        'socket_path' => env('DATADOG_SOCKET_PATH'),
+        'datadog_host' => env('DATADOG_DATADOG_HOST'),
+        'global_tags' => env('DATADOG_GLOBAL_TAGS'),
+        // prefix every metric with this string.
+        // end with '.' for better readibility. example: 'laravel.'
+        'metric_prefix' => env('DATADOG_METRIC_PREFIX'),
+    ],
+    'tags' => [
+        'app' => env('DATADOG_TAGS_APP') ?? config('app.name'),
+        'env' => env('DATADOG_TAGS_ENV') ?? config('app.env'),
+    ],
+    'middleware' => [
+        'metric_name' => env('DATADOG_MIDDLEWARE_METRIC_NAME', 'request'),
+        // on middleware metric, exclude certain tags from being sent to datadog.
+        // put them in a comma separated string.
+        // list of possible tags: app,environment,action,host,status_code
+        'exclude_tags' => explode(',', env('DATADOG_MIDDLEWARE_EXCLUDE_TAGS', '')),
+    ],
 ];
+
 ```
 
-Optionally, you can publish the views using
+## ENV value
 
-```bash
-php artisan vendor:publish --tag="datadog-laravel-metric-views"
+As mentioned in config file, these are the ENV values that can be set for configuration
+
+```
+DATADOG_ENABLED
+DATADOG_HOST
+DATADOG_PORT
+DATADOG_SOCKET_PATH
+DATADOG_DATADOG_HOST
+DATADOG_GLOBAL_TAGS
+DATADOG_METRIC_PREFIX
+DATADOG_TAGS_APP
+DATADOG_TAGS_ENV
+DATADOG_MIDDLEWARE_METRIC_NAME
+DATADOG_MIDDLEWARE_EXCLUDE_TAGS
 ```
 
 ## Usage
+
+### Laravel Middleware SendRequestDatadogMetric
+
+This Middleware should be auto-added (prepended) to your Laravel app's middleware via Service Provider
+
+### Custom Metric ( `measure` )
+
+```php
+use Mamitech\DatadogLaravelMetric\DatadogLaravelMetric;
+
+$func = function () {
+    return 'hello this is testing for measure';
+};
+
+$startTime = microtime(true);
+$result = $func();
+$duration = microtime(true) - $startTime;
+
+app(DatadogLaravelMetric::class)->measure('my.metric', ['tag1' => 'value1', 'tag2' => 'value2'], $duration);
+```
+
+### Custom Metric Function ( `measureFunc` )
+
+```php
+$func = function () {
+    return 'hello i am measureFunc';
+};
+
+$result = $datadogLaravelMetric->measureFunc('my.metric', ['tag1' => 'value1', 'tag2' => 'value2'], $func);
+```
 
 ```php
 $datadogLaravelMetric = new Mamitech\DatadogLaravelMetric();
@@ -74,18 +134,9 @@ composer test
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
-## Contributing
-
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
-
 ## Credits
 
-- [Aulia Rachmawan](https://github.com/mamitech)
-- [All Contributors](../../contributors)
+- [mamitech](https://github.com/mamitech)
 
 ## License
 

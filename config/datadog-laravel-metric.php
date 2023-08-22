@@ -21,7 +21,7 @@ return [
         'metric_name' => env('DATADOG_MIDDLEWARE_METRIC_NAME', 'request'),
         // on middleware metric, exclude certain tags from being sent to datadog.
         // put them in a comma separated string.
-        // list of possible tags: app,environment,controller,action,host,status_code
+        // list of possible tags: app,environment,action,host,status_code
         'exclude_tags' => explode(',', env('DATADOG_MIDDLEWARE_EXCLUDE_TAGS', '')),
     ],
 ];
