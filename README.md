@@ -48,6 +48,82 @@ Add this into your Laravel `config/app.php` inside the array of `'aliases'`
 ];
 ```
 
+## Configs
+
+These are the configuration (as included in `config/datadog-laravel-metric.php`)
+
+### 'enabled' 
+
+Toggle the feature on/off
+
+### 'init_config' 
+
+These are configs to initialize DogstatsD object, the main class for sending metric to DataDog
+
+#### 'host' 
+
+Datadog Agent (or specifically DogstatsD) host address
+
+#### 'port' 
+
+Datadog Agent (or specifically DogstatsD) port. The default is 8125.
+
+#### 'socket_path' 
+
+
+
+#### 'datadog_host' 
+
+The host of the DataDog you send metric data to. The default is 'https://app.datadoghq.com' .
+
+#### 'api_key' 
+
+API key you get on your DataDog account.
+
+#### 'app_key' 
+
+APP key you generate on your DataDog account.
+
+#### 'global_tags' 
+
+Tags that you want to include everywhere every time sending metric from your app.
+
+#### 'metric_prefix' 
+
+Global prefix to each metric name you set.
+
+### 'tags' 
+
+List of important tags. Mainly used for Middleware.
+
+#### 'app' 
+
+The name of the app.
+
+#### 'env' 
+
+The environment the app runs.
+
+### 'middleware' 
+
+Specific config regarding Middleware.
+
+### 'metric_name' 
+
+Specify the metric name for each request data. The default is `request`.
+
+### 'exclude_tags' 
+
+On the Middleware, you can exclude certain tags from being sent to datadog. Put them in a comma separated string.
+
+List of possible tags (by default those tags are sent as metric data):
+
+- app
+- environment
+- action
+- host
+- status_code
+
 ## ENV value
 
 As mentioned in config file, these are the ENV values that can be set for configuration
@@ -93,16 +169,13 @@ app(DatadogLaravelMetric::class)->measure('my.metric', ['tag1' => 'value1', 'tag
 ### Custom Metric Function ( `measureFunc` )
 
 ```php
+use Mamitech\DatadogLaravelMetric\DatadogLaravelMetric;
+
 $func = function () {
     return 'hello i am measureFunc';
 };
 
-$result = $datadogLaravelMetric->measureFunc('my.metric', ['tag1' => 'value1', 'tag2' => 'value2'], $func);
-```
-
-```php
-$datadogLaravelMetric = new Mamitech\DatadogLaravelMetric();
-echo $datadogLaravelMetric->echoPhrase('Hello, Mamitech!');
+$result = app(DatadogLaravelMetric::class)->measureFunc('my.metric', ['tag1' => 'value1', 'tag2' => 'value2'], $func);
 ```
 
 ## Testing
