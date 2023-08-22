@@ -36,6 +36,18 @@ You can publish the config file with:
 php artisan vendor:publish --provider="Mamitech\DatadogLaravelMetric\DatadogLaravelMetricServiceProvider"
 ```
 
+### (optional) add alias to your app
+
+You can add alias to simplify call the DatadogLaravelMetric API
+
+Add this into your Laravel `config/app.php` inside the array of `'aliases'`
+```php
+'aliases' => [
+    // ommitted
+    'DatadogMetric' => Mamitech\DatadogLaravelMetric\Facades\DatadogLaravelMetric::class,
+];
+```
+
 ## ENV value
 
 As mentioned in config file, these are the ENV values that can be set for configuration

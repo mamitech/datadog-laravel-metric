@@ -28,15 +28,13 @@ class SendRequestDatadogMetric
         $duration = microtime(true) - $metricStartTime;
 
         // tags get request controller name, action, and request method and status code
-        $controller = $request->route()?->getAction()['controller'] ?? 'unknownController';
-        $methodName = $request->route()?->getAction()['action'] ?? 'unknownMethod';
-        $action = $controller.'@'.$methodName;
+        $action = $request->route()?->getAction()['controller'] ?? 'unknownController@unknownMethod';
         $tags = [
             'app' => config('datadog-laravel-metric.tags.app'),
             'environment' => config('datadog-laravel-metric.tags.env'),
             'action' => $action,
             'host' => $request->getHost(),
-            'status_code' => null,
+            'status_code' => $response?->getStatusCode() ?? 500,
         ];
 
         // exclude certain tags from being sent to datadog
