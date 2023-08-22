@@ -4,11 +4,13 @@
 return [
     'enabled' => env('DATADOG_ENABLED', false),
     'init_config' => [
-        'host' => env('DATADOG_HOST', 'localhost'),
-        'port' => env('DATADOG_PORT', 8125),
+        'host' => env('DATADOG_STATSD_SERVER', 'localhost'),
+        'port' => env('DATADOG_STATSD_PORT', 8125),
         'socket_path' => env('DATADOG_SOCKET_PATH'),
-        'datadog_host' => env('DATADOG_DATADOG_HOST'),
-        'global_tags' => env('DATADOG_GLOBAL_TAGS'),
+        'datadog_host' => env('DATADOG_HOST', 'https://app.datadoghq.com'),
+        'api_key' => env('DATADOG_API_KEY'),
+        'app_key' => env('DATADOG_APP_KEY'),
+        'global_tags' => explode(',', env('DATADOG_GLOBAL_TAGS', '')),
         // prefix every metric with this string.
         // end with '.' for better readibility. example: 'laravel.'
         'metric_prefix' => env('DATADOG_METRIC_PREFIX'),

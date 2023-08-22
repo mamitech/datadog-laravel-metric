@@ -33,39 +33,9 @@ composer require mamitech/datadog-laravel-metric
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="datadog-laravel-metric-config"
+php artisan vendor:publish --provider="Mamitech\DatadogLaravelMetric\DatadogLaravelMetricServiceProvider"
 ```
 
-This is the contents of the published config file:
-
-```php
-<?php
-
-// config for Mamitech/DatadogLaravelMetric
-return [
-    'enabled' => env('DATADOG_ENABLED', false),
-    'init_config' => [
-        'host' => env('DATADOG_HOST', 'localhost'),
-        'port' => env('DATADOG_PORT', 8125),
-        'socket_path' => env('DATADOG_SOCKET_PATH'),
-        'datadog_host' => env('DATADOG_DATADOG_HOST'),
-        'global_tags' => env('DATADOG_GLOBAL_TAGS'),
-        // prefix every metric with this string.
-        // end with '.' for better readibility. example: 'laravel.'
-        'metric_prefix' => env('DATADOG_METRIC_PREFIX'),
-    ],
-    'tags' => [
-        'app' => env('DATADOG_TAGS_APP') ?? config('app.name'),
-        'env' => env('DATADOG_TAGS_ENV') ?? config('app.env'),
-    ],
-    'middleware' => [
-        'metric_name' => env('DATADOG_MIDDLEWARE_METRIC_NAME', 'request'),
-        // on middleware metric, exclude certain tags from being sent to datadog.
-        // put them in a comma separated string.
-        // list of possible tags: app,environment,action,host,status_code
-        'exclude_tags' => explode(',', env('DATADOG_MIDDLEWARE_EXCLUDE_TAGS', '')),
-    ],
-];
 
 ```
 
@@ -75,10 +45,12 @@ As mentioned in config file, these are the ENV values that can be set for config
 
 ```
 DATADOG_ENABLED
-DATADOG_HOST
-DATADOG_PORT
+DATADOG_STATSD_SERVER
+DATADOG_STATSD_PORT
 DATADOG_SOCKET_PATH
-DATADOG_DATADOG_HOST
+DATADOG_HOST
+DATADOG_API_KEY
+DATADOG_APP_KEY
 DATADOG_GLOBAL_TAGS
 DATADOG_METRIC_PREFIX
 DATADOG_TAGS_APP
