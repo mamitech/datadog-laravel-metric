@@ -36,9 +36,6 @@ You can publish the config file with:
 php artisan vendor:publish --provider="Mamitech\DatadogLaravelMetric\DatadogLaravelMetricServiceProvider"
 ```
 
-
-```
-
 ## ENV value
 
 As mentioned in config file, these are the ENV values that can be set for configuration
