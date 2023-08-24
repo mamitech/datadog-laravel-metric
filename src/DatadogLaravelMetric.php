@@ -5,7 +5,7 @@ namespace Mamitech\DatadogLaravelMetric;
 use Closure;
 use DataDog\DogStatsd;
 
-class DatadogLaravelMetric extends DogStatsd
+class DatadogLaravelMetric
 {
     private $dogstatsd;
 

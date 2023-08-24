@@ -70,7 +70,7 @@ Datadog Agent (or specifically DogstatsD) port. The default is 8125.
 
 #### 'socket_path' 
 
-
+from DogstatsD docs: The path to the DogStatsD Unix domain socket (overrides host and port). This is only supported with Agent v6+. https://docs.datadoghq.com/developers/dogstatsd/?code-lang=php&tab=hostagent#client-instantiation-parameters
 
 #### 'datadog_host' 
 
@@ -86,7 +86,7 @@ APP key you generate on your DataDog account.
 
 #### 'global_tags' 
 
-Tags that you want to include everywhere every time sending metric from your app.
+Tags that you want to include everywhere every time sending metric from your app. Formatted as array with key-value.
 
 #### 'metric_prefix' 
 
@@ -129,14 +129,13 @@ List of possible tags (by default those tags are sent as metric data):
 As mentioned in config file, these are the ENV values that can be set for configuration
 
 ```
-DATADOG_ENABLED
+DATADOG_METRIC_ENABLED
 DATADOG_STATSD_SERVER
 DATADOG_STATSD_PORT
 DATADOG_SOCKET_PATH
 DATADOG_HOST
 DATADOG_API_KEY
 DATADOG_APP_KEY
-DATADOG_GLOBAL_TAGS
 DATADOG_METRIC_PREFIX
 DATADOG_TAGS_APP
 DATADOG_TAGS_ENV
