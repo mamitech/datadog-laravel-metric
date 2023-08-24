@@ -41,7 +41,11 @@ class DatadogLaravelMetric
 
         $duration = microtime(true) - $startTime;
 
-        $this->dogstatsd->microtiming($metricName, $duration, $sampling, $tags);
+        try {
+            $this->dogstatsd->microtiming($metricName, $duration, $sampling, $tags);
+        } catch (\Throwable $th) {
+            // do nothing
+        }
 
         return $returnVal;
     }
@@ -68,6 +72,10 @@ class DatadogLaravelMetric
         if (! config('datadog-laravel-metric.enabled', false)) {
             return;
         }
-        $this->dogstatsd->microtiming($metricName, $duration, $sampling, $tags);
+        try {
+            $this->dogstatsd->microtiming($metricName, $duration, $sampling, $tags);
+        } catch (\Throwable $th) {
+            // do nothing
+        }
     }
 }
