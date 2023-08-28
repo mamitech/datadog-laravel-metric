@@ -44,7 +44,9 @@ class DatadogLaravelMetric
         try {
             $this->dogstatsd->microtiming($metricName, $duration, $sampling, $tags);
         } catch (\Throwable $th) {
-            // do nothing
+            if (class_exists('Illuminate\Support\Facades\Log')) {
+                \Illuminate\Support\Facades\Log::warning('DatadogLaravelMetric: ' . $th->getMessage());
+            }
         }
 
         return $returnVal;
@@ -75,7 +77,32 @@ class DatadogLaravelMetric
         try {
             $this->dogstatsd->microtiming($metricName, $duration, $sampling, $tags);
         } catch (\Throwable $th) {
-            // do nothing
+            if (class_exists('Illuminate\Support\Facades\Log')) {
+                \Illuminate\Support\Facades\Log::warning('DatadogLaravelMetric: ' . $th->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Handle dynamic function calls to be forwarded to DogstatsD.
+     * Mainly for main function of DogstatsD : increment, decrement, gauge, set, histogram, distribution
+     * Wrapped with toggle.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if (! config('datadog-laravel-metric.enabled', false)) {
+            return;
+        }
+        try {
+            $this->dogstatsd->$method(...$parameters);
+        } catch (\Throwable $th) {
+            if (class_exists('Illuminate\Support\Facades\Log')) {
+                \Illuminate\Support\Facades\Log::warning('DatadogLaravelMetric: ' . $th->getMessage());
+            }
         }
     }
 }

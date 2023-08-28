@@ -33,8 +33,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Mamitech\\DatadogLaravelMetric\\": "src/",
-            "Mamitech\\DatadogLaravelMetric\\Database\\Factories\\": "database/factories/"
+            "Mamitech\\DatadogLaravelMetric\\": "src/"
         }
     },
     "autoload-dev": {
