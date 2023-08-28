@@ -11,6 +11,7 @@ function mockDogstatsd(string $method, bool $receive = true)
     } else {
         $mockDatadog->shouldNotReceive($method);
     }
+
     return $mockDatadog;
 }
 
@@ -51,14 +52,13 @@ test('measure', function (bool $enabled, bool $receive) {
     expect($result === $func())->toBeTrue();
 })->with('toggle-status');
 
-
 // testing functions from DogstatsD
 test('microtiming', function (bool $enabled, bool $receive) {
     config(['datadog-laravel-metric.enabled' => $enabled]);
     $datadogLaravelMetric = new DatadogLaravelMetric(mockDogstatsd('microtiming', $receive));
 
     $func = function () {
-        return 'hello this is testing for microtiming' ;
+        return 'hello this is testing for microtiming';
     };
 
     $startTime = microtime(true);
@@ -66,8 +66,8 @@ test('microtiming', function (bool $enabled, bool $receive) {
     $duration = microtime(true) - $startTime;
 
     $datadogLaravelMetric->microtiming(
-        stat: 'my.metric', 
-        tags: ['tag1' => 'value1', 'tag2' => 'value2'], 
+        stat: 'my.metric',
+        tags: ['tag1' => 'value1', 'tag2' => 'value2'],
         time: $duration
     );
 
@@ -83,7 +83,7 @@ foreach ([
         $datadogLaravelMetric = new DatadogLaravelMetric(mockDogstatsd($method, $receive));
 
         $func = function () use ($method) {
-            return 'hello this is testing for ' . $method ;
+            return 'hello this is testing for '.$method;
         };
 
         $startTime = microtime(true);
@@ -91,8 +91,8 @@ foreach ([
         $duration = microtime(true) - $startTime;
 
         $datadogLaravelMetric->$method(
-            stats: 'my.metric', 
-            tags: ['tag1' => 'value1', 'tag2' => 'value2'], 
+            stats: 'my.metric',
+            tags: ['tag1' => 'value1', 'tag2' => 'value2'],
             value: 1
         );
 
@@ -104,27 +104,27 @@ foreach ([
     'gauge',
     'set',
     'histogram',
-    'distribution'
+    'distribution',
 ] as $method) {
     test($method, function (bool $enabled, bool $receive) use ($method) {
         config(['datadog-laravel-metric.enabled' => $enabled]);
-    
+
         $datadogLaravelMetric = new DatadogLaravelMetric(mockDogstatsd($method, $receive));
-    
+
         $func = function () use ($method) {
-            return 'hello this is testing for ' . $method;
+            return 'hello this is testing for '.$method;
         };
-    
+
         $startTime = microtime(true);
         $result = $func();
         $duration = microtime(true) - $startTime;
-    
+
         $datadogLaravelMetric->$method(
-            stat: 'my.metric', 
-            tags: ['tag1' => 'value1', 'tag2' => 'value2'], 
+            stat: 'my.metric',
+            tags: ['tag1' => 'value1', 'tag2' => 'value2'],
             value: $duration
         );
-    
+
         expect($result === $func())->toBeTrue();
     })->with('toggle-status');
 }

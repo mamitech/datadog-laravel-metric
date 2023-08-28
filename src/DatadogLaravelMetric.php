@@ -45,7 +45,7 @@ class DatadogLaravelMetric
             $this->dogstatsd->microtiming($metricName, $duration, $sampling, $tags);
         } catch (\Throwable $th) {
             if (class_exists('Illuminate\Support\Facades\Log')) {
-                \Illuminate\Support\Facades\Log::warning('DatadogLaravelMetric: ' . $th->getMessage());
+                \Illuminate\Support\Facades\Log::warning('DatadogLaravelMetric: '.$th->getMessage());
             }
         }
 
@@ -78,7 +78,7 @@ class DatadogLaravelMetric
             $this->dogstatsd->microtiming($metricName, $duration, $sampling, $tags);
         } catch (\Throwable $th) {
             if (class_exists('Illuminate\Support\Facades\Log')) {
-                \Illuminate\Support\Facades\Log::warning('DatadogLaravelMetric: ' . $th->getMessage());
+                \Illuminate\Support\Facades\Log::warning('DatadogLaravelMetric: '.$th->getMessage());
             }
         }
     }
@@ -101,7 +101,7 @@ class DatadogLaravelMetric
             $this->dogstatsd->$method(...$parameters);
         } catch (\Throwable $th) {
             if (class_exists('Illuminate\Support\Facades\Log')) {
-                \Illuminate\Support\Facades\Log::warning('DatadogLaravelMetric: ' . $th->getMessage());
+                \Illuminate\Support\Facades\Log::warning('DatadogLaravelMetric: '.$th->getMessage());
             }
         }
     }
