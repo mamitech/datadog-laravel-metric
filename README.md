@@ -157,7 +157,13 @@ This Middleware should be auto-added (prepended) to your Laravel app's middlewar
 
 ### Functions from [DogstatsD](https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/?code-lang=php)
 
-This Library wraps DogstatsD so this can use functions from them. This also adds global toggle and error handle (it will try to call `Log::warning` ).
+This Library wraps DogstatsD so this can use functions from them. This also adds global toggle and error handle (it will try to call `Log::warning` ). The main functions are:
+- `count`
+- `gauge`
+- `set`
+- `histogram`
+- `timer`
+- `distribution`
 
 ### Custom Metric ( `measure` )
 
