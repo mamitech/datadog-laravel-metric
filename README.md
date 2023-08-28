@@ -15,6 +15,9 @@ Collect Laravel's request histogram data and custom metric for Datadog.
 ## Feature
 
 - Toggleable via env value
+- Can use the same API as [DogstatsD](https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/?code-lang=php)
+    - Wrapped with toggle
+    - Error handled with `Log::warning`
 - Laravel middleware integration. By default, it contains these tags
     - app
     - environment
@@ -24,9 +27,7 @@ Collect Laravel's request histogram data and custom metric for Datadog.
 - Any default Tags above can be disabled via config
 
 ## Limitation
-
-- For now it's only support DogstatsD histogram (microtiming)
-
+- Error handled with `Log::warning` , maybe this should be changed into some configurable Error Handler Interface (e.g.: You want to send the error to your Error Tracker)
 ## Installation
 
 You can install the package via composer:
