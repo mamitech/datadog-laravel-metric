@@ -155,13 +155,11 @@ DATADOG_MIDDLEWARE_EXCLUDE_TAGS
 
 This Middleware should be auto-added (prepended) to your Laravel app's middleware via Service Provider
 
-### Custom Metric ( `measure` )
-
-#### Functions from [DogstatsD](https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/?code-lang=php)
+### Functions from [DogstatsD](https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/?code-lang=php)
 
 This Library wraps DogstatsD so this can use functions from them. This also adds global toggle and error handle (it will try to call `Log::warning` ).
 
-#### Custom Made
+### Custom Metric ( `measure` )
 
 ```php
 use Mamitech\DatadogLaravelMetric\DatadogLaravelMetric;
