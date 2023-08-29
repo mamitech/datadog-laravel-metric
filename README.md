@@ -9,8 +9,8 @@ Collect Laravel's request histogram data and custom metric for Datadog.
 
 ## Requirement
 
-- PHP 8 or later
-- Laravel 9 or later
+- PHP 8
+- Laravel 9
 
 ## Feature
 
