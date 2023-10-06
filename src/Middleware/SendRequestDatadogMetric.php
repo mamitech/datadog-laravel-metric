@@ -33,7 +33,7 @@ class SendRequestDatadogMetric
             'app' => config('datadog-laravel-metric.tags.app'),
             'environment' => config('datadog-laravel-metric.tags.env'),
             'action' => $action,
-            'host' => $request->getHost(),
+            'domain' => $request->getHost(),
             'status_code' => $response?->getStatusCode() ?? 500,
         ];
 
