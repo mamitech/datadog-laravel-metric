@@ -41,7 +41,7 @@ it('sends metric data to datadog and exclude tag as configured', function () {
                 'app' => 'testing-app',
                 'environment' => 'testing',
                 'action' => 'unknownController@unknownMethod',
-                'host' => '',
+                'domain' => '',
             ]
         )
         ->once();
