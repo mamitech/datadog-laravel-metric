@@ -18,15 +18,15 @@
     "require": {
         "php": "^8.0",
         "datadog/php-datadogstatsd": "^1.6",
-        "illuminate/contracts": "^9.0"
+        "illuminate/contracts": "^10"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
-        "nunomaduro/collision": "^6.0",
+        "nunomaduro/collision": "^7.0",
         "nunomaduro/larastan": "^2.0.1",
-        "orchestra/testbench": "^7.0",
-        "pestphp/pest": "^1.0",
-        "pestphp/pest-plugin-laravel": "^1.0",
+        "orchestra/testbench": "^8",
+        "pestphp/pest": "^2",
+        "pestphp/pest-plugin-laravel": "^2",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0"
