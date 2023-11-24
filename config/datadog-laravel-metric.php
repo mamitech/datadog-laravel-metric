@@ -25,5 +25,10 @@ return [
         // put them in a comma separated string.
         // list of possible tags: app,environment,action,host,status_code
         'exclude_tags' => explode(',', env('DATADOG_MIDDLEWARE_EXCLUDE_TAGS', '')),
+
+        'tag_transformers' => [
+            // list of classes that implements Mamitech\DatadogLaravelMetric\TagTransformer
+            // example: \App\Datadog\AddHostTagTransformer
+        ],
     ],
 ];

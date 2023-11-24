@@ -130,6 +130,15 @@ List of possible tags (by default those tags are sent as metric data):
 - host
 - status_code
 
+### 'tag_transformers'
+
+On the Middleware, you can transform (modify) array of tags before it's sent to datadog.
+To do that, you have to write your own class in your Laravel app and 
+`implements \Mamitech\DatadogLaravelMetric\TagTransformer`.
+
+Then, put the class names inside the array. For example, please refer to class `TransformerForTest`
+inside `tests/Middleware/SendRequestDatadogMetricTest.php`.
+
 ## ENV value
 
 As mentioned in config file, these are the ENV values that can be set for configuration

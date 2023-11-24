@@ -77,3 +77,47 @@ it('does not send metric data to datadog when disabled', function () {
 
     expect($expectedResponse === $response)->toBeTrue();
 });
+
+class TransformerForTest implements \Mamitech\DatadogLaravelMetric\TagTransformer {
+    public function transform(array $data): array {
+        $data['app'] = 'modified';
+        unset($data['environment']);
+        return $data;
+    }
+}
+
+it('transform the tag when transformer exists', function() {
+    config([
+        'datadog-laravel-metric.enabled' => true,
+        'datadog-laravel-metric.tags.app' => 'testing-app',
+        'datadog-laravel-metric.tags.environment' => 'testing',
+        'datadog-laravel-metric.middleware.tag_transformers' => [TransformerForTest::class]
+    ]);
+
+    $mockDatadog = Mockery::mock(DogStatsd::class);
+    $mockDatadog->shouldReceive('microtiming')
+    ->with(
+        'request',
+        Mockery::any(),
+        1,
+        [
+            'app' => 'modified',
+            'action' => 'unknownController@unknownMethod',
+            'domain' => '',
+            'status_code' => 200
+        ]
+    )
+    ->once();
+    $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
+
+    $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
+    $expectedResponse = new Response();
+    $response = $sampleRequestMiddleware->handle(
+        new Request(),
+        static function () use ($expectedResponse) {
+            return $expectedResponse;
+        }
+    );
+
+    expect($expectedResponse === $response)->toBeTrue();
+});
