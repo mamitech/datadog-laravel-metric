@@ -43,6 +43,15 @@ class SendRequestDatadogMetric
             unset($tags[$excludeTag]);
         }
 
+        $tagTransformers = config('datadog-laravel-metric.middleware.tag_transformer');
+        // check if $tagTransformers is an array
+        if (is_array($tagTransformers)) {
+            foreach ($tagTransformers as $transClass) {
+                $transformer = app($transClass);
+                $tags = $transformer->transform($tags);
+            }
+        }
+
         // send to Datadog
         $metricName = config('datadog-laravel-metric.middleware.metric_name');
         $this->datadogLaravelMetric->measure($metricName, $tags, $duration);
