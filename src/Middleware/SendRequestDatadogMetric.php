@@ -44,7 +44,7 @@ class SendRequestDatadogMetric
             unset($tags[$excludeTag]);
         }
 
-        $tagTransformers = config('datadog-laravel-metric.middleware.tag_transformer');
+        $tagTransformers = config('datadog-laravel-metric.middleware.tag_transformers');
         // check if $tagTransformers is an array
         if (is_array($tagTransformers)) {
             foreach ($tagTransformers as $transClass) {

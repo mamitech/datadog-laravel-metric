@@ -91,7 +91,7 @@ it('transform the tag when transformer exists', function() {
         'datadog-laravel-metric.enabled' => true,
         'datadog-laravel-metric.tags.app' => 'testing-app',
         'datadog-laravel-metric.tags.environment' => 'testing',
-        'datadog-laravel-metric.middleware.tag_transformer' => [TransformerForTest::class]
+        'datadog-laravel-metric.middleware.tag_transformers' => [TransformerForTest::class]
     ]);
 
     $mockDatadog = Mockery::mock(DogStatsd::class);
