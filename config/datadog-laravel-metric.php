@@ -28,7 +28,7 @@ return [
 
         'tag_transformer' => [
             // list of classes that implement Mamitech\DatadogLaravelMetric\TagTransformer
-            // example: Mamitech\DatadogLaravelMetric\TagTransformer\ReplaceTagTransformer
+            // example: \App\Datadog\AddHostTagTransformer
         ],
     ],
 ];
