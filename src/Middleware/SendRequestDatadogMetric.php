@@ -5,6 +5,7 @@ namespace Mamitech\DatadogLaravelMetric\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Mamitech\DatadogLaravelMetric\DatadogLaravelMetric;
+use Mamitech\DatadogLaravelMetric\TagTransformer;
 
 class SendRequestDatadogMetric
 {
@@ -48,6 +49,9 @@ class SendRequestDatadogMetric
         if (is_array($tagTransformers)) {
             foreach ($tagTransformers as $transClass) {
                 $transformer = app($transClass);
+                if (! $transformer instanceof TagTransformer) {
+                    throw new \Exception("Class $transClass must implement Mamitech\DatadogLaravelMetric\TagTransformer");
+                }
                 $tags = $transformer->transform($tags);
             }
         }

@@ -1,5 +1,7 @@
 <?php
 
+namespace Mamitech\DatadogLaravelMetric;
+
 interface TagTransformer
 {
     // transform tags and return the new modified tags

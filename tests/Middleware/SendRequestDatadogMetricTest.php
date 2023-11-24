@@ -78,8 +78,8 @@ it('does not send metric data to datadog when disabled', function () {
     expect($expectedResponse === $response)->toBeTrue();
 });
 
-class TransformerForTest {
-    public function transform(array $data) {
+class TransformerForTest implements \Mamitech\DatadogLaravelMetric\TagTransformer {
+    public function transform(array $data): array {
         $data['app'] = 'modified';
         unset($data['environment']);
         return $data;
