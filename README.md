@@ -9,25 +9,27 @@ Collect Laravel's request histogram data and custom metric for Datadog.
 
 ## Requirement
 
-- PHP 8
-- Laravel 9
+-   PHP ^8.0|^8.2
+-   Laravel ^10|^11|^12
 
 ## Feature
 
-- Toggleable via env value
-- Can use the same API as [DogstatsD](https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/?code-lang=php)
-    - Wrapped with toggle
-    - Error handled with `Log::warning`
-- Laravel middleware integration. By default, it contains these tags
-    - app
-    - environment
-    - action
-    - host
-    - status_code
-- Any default Tags above can be disabled via config
+-   Toggleable via env value
+-   Can use the same API as [DogstatsD](https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/?code-lang=php)
+    -   Wrapped with toggle
+    -   Error handled with `Log::warning`
+-   Laravel middleware integration. By default, it contains these tags
+    -   app
+    -   environment
+    -   action
+    -   host
+    -   status_code
+-   Any default Tags above can be disabled via config
 
 ## Limitation
-- Error handled with `Log::warning` , maybe this should be changed into some configurable Error Handler Interface (e.g.: You want to send the error to your Error Tracker)
+
+-   Error handled with `Log::warning` , maybe this should be changed into some configurable Error Handler Interface (e.g.: You want to send the error to your Error Tracker)
+
 ## Installation
 
 You can install the package via composer:
@@ -47,6 +49,7 @@ php artisan vendor:publish --provider="Mamitech\DatadogLaravelMetric\DatadogLara
 You can add alias to simplify call the DatadogLaravelMetric API
 
 Add this into your Laravel `config/app.php` inside the array of `'aliases'`
+
 ```php
 'aliases' => [
     // ommitted
@@ -58,82 +61,82 @@ Add this into your Laravel `config/app.php` inside the array of `'aliases'`
 
 These are the configuration (as included in `config/datadog-laravel-metric.php`)
 
-### 'enabled' 
+### 'enabled'
 
 Toggle the feature on/off
 
-### 'init_config' 
+### 'init_config'
 
 These are configs to initialize DogstatsD object, the main class for sending metric to DataDog
 
-#### 'host' 
+#### 'host'
 
 Datadog Agent (or specifically DogstatsD) host address
 
-#### 'port' 
+#### 'port'
 
 Datadog Agent (or specifically DogstatsD) port. The default is 8125.
 
-#### 'socket_path' 
+#### 'socket_path'
 
 from DogstatsD docs: The path to the DogStatsD Unix domain socket (overrides host and port). This is only supported with Agent v6+. https://docs.datadoghq.com/developers/dogstatsd/?code-lang=php&tab=hostagent#client-instantiation-parameters
 
-#### 'datadog_host' 
+#### 'datadog_host'
 
 The host of the DataDog you send metric data to. The default is 'https://app.datadoghq.com' .
 
-#### 'api_key' 
+#### 'api_key'
 
 API key you get on your DataDog account.
 
-#### 'app_key' 
+#### 'app_key'
 
 APP key you generate on your DataDog account.
 
-#### 'global_tags' 
+#### 'global_tags'
 
 Tags that you want to include everywhere every time sending metric from your app. Formatted as array with key-value.
 
-#### 'metric_prefix' 
+#### 'metric_prefix'
 
 Global prefix to each metric name you set.
 
-### 'tags' 
+### 'tags'
 
 List of important tags. Mainly used for Middleware.
 
-#### 'app' 
+#### 'app'
 
 The name of the app.
 
-#### 'env' 
+#### 'env'
 
 The environment the app runs.
 
-### 'middleware' 
+### 'middleware'
 
 Specific config regarding Middleware.
 
-### 'metric_name' 
+### 'metric_name'
 
 Specify the metric name for each request data. The default is `request`.
 
-### 'exclude_tags' 
+### 'exclude_tags'
 
 On the Middleware, you can exclude certain tags from being sent to datadog. Put them in a comma separated string.
 
 List of possible tags (by default those tags are sent as metric data):
 
-- app
-- environment
-- action
-- host
-- status_code
+-   app
+-   environment
+-   action
+-   host
+-   status_code
 
 ### 'tag_transformers'
 
 On the Middleware, you can transform (modify) array of tags before it's sent to datadog.
-To do that, you have to write your own class in your Laravel app and 
+To do that, you have to write your own class in your Laravel app and
 `implements \Mamitech\DatadogLaravelMetric\TagTransformer`.
 
 Then, put the class names inside the array. For example, please refer to class `TransformerForTest`
@@ -167,12 +170,13 @@ This Middleware should be auto-added (prepended) to your Laravel app's middlewar
 ### Functions from [DogstatsD](https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/?code-lang=php)
 
 This Library wraps DogstatsD so this can use functions from them. This also adds global toggle and error handle (it will try to call `Log::warning` ). The main functions are:
-- `count`
-- `gauge`
-- `set`
-- `histogram`
-- `timer`
-- `distribution`
+
+-   `count`
+-   `gauge`
+-   `set`
+-   `histogram`
+-   `timer`
+-   `distribution`
 
 ### Custom Metric ( `measure` )
 
@@ -214,7 +218,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 
 ## Credits
 
-- [mamitech](https://github.com/mamitech)
+-   [mamitech](https://github.com/mamitech)
 
 ## License
 
