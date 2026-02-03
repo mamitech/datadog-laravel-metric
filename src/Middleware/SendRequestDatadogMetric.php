@@ -9,6 +9,8 @@ use Mamitech\DatadogLaravelMetric\TagTransformer;
 
 class SendRequestDatadogMetric
 {
+    private const DEFAULT_ACTION = 'unknownController@unknownMethod';
+
     private $datadogLaravelMetric;
 
     public function __construct(DatadogLaravelMetric $datadogLaravelMetric)
@@ -29,7 +31,7 @@ class SendRequestDatadogMetric
         $duration = microtime(true) - $metricStartTime;
 
         // tags get request controller name, action, and request method and status code
-        $action = $request->route()?->getAction()['controller'] ?? 'unknownController@unknownMethod';
+        $action = $this->resolveAction($request);
         $tags = [
             'app' => config('datadog-laravel-metric.tags.app'),
             'environment' => config('datadog-laravel-metric.tags.env'),
@@ -61,5 +63,51 @@ class SendRequestDatadogMetric
         $this->datadogLaravelMetric->measure($metricName, $tags, $duration);
 
         return $response;
+    }
+
+    /**
+     * Resolve the action name from the request route.
+     */
+    private function resolveAction(Request $request): string
+    {
+        $route = $request->route();
+
+        if ($route === null) {
+            return self::DEFAULT_ACTION;
+        }
+
+        $routeAction = $route->getAction();
+
+        // Case 1: Controller string in 'controller' key (e.g., 'App\Http\Controllers\UserController@show')
+        if (isset($routeAction['controller']) && is_string($routeAction['controller'])) {
+            return $routeAction['controller'];
+        }
+
+        // Case 2: Check 'uses' key for controller string or Closure
+        if (isset($routeAction['uses'])) {
+            $uses = $routeAction['uses'];
+
+            // String controller reference
+            if (is_string($uses)) {
+                return $uses;
+            }
+
+            // Closure route
+            if ($uses instanceof \Closure) {
+                return 'Closure';
+            }
+
+            // Array syntax: [Controller::class, 'method']
+            if (is_array($uses) && count($uses) === 2) {
+                return $uses[0] . '@' . $uses[1];
+            }
+
+            // Invokable object (callable with __invoke method)
+            if (is_object($uses) && method_exists($uses, '__invoke')) {
+                return get_class($uses) . '@__invoke';
+            }
+        }
+
+        return self::DEFAULT_ACTION;
     }
 }
