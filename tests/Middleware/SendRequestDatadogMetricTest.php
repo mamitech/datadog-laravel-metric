@@ -3,6 +3,7 @@
 use DataDog\DogStatsd;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Route;
 use Mamitech\DatadogLaravelMetric\DatadogLaravelMetric;
 use Mamitech\DatadogLaravelMetric\Middleware\SendRequestDatadogMetric;
 
@@ -14,9 +15,9 @@ it('sends metric data to datadog when enabled', function () {
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
-        new Request(),
+        new Request,
         static function () use ($expectedResponse) {
             return $expectedResponse;
         }
@@ -48,9 +49,9 @@ it('sends metric data to datadog and exclude tag as configured', function () {
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
-        new Request(),
+        new Request,
         static function () use ($expectedResponse) {
             return $expectedResponse;
         }
@@ -67,9 +68,9 @@ it('does not send metric data to datadog when disabled', function () {
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
-        new Request(),
+        new Request,
         static function () use ($expectedResponse) {
             return $expectedResponse;
         }
@@ -77,6 +78,289 @@ it('does not send metric data to datadog when disabled', function () {
 
     expect($expectedResponse === $response)->toBeTrue();
 });
+
+it('resolves action from controller key correctly', function () {
+    config(['datadog-laravel-metric.enabled' => true]);
+    config(['datadog-laravel-metric.tags.app' => 'testing-app']);
+    config(['datadog-laravel-metric.tags.env' => 'testing']);
+
+    $mockDatadog = Mockery::mock(DogStatsd::class);
+    $mockDatadog->shouldReceive('microtiming')
+        ->with(
+            'request',
+            Mockery::any(),
+            1,
+            Mockery::on(function ($tags) {
+                return $tags['action'] === 'App\\Http\\Controllers\\UserController@show';
+            })
+        )
+        ->once();
+    $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
+
+    $request = new Request;
+    $route = new Route(['GET'], '/users/{id}', ['controller' => 'App\\Http\\Controllers\\UserController@show']);
+    $request->setRouteResolver(fn () => $route);
+
+    $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
+    $expectedResponse = new Response;
+    $response = $sampleRequestMiddleware->handle(
+        $request,
+        static function () use ($expectedResponse) {
+            return $expectedResponse;
+        }
+    );
+
+    expect($expectedResponse === $response)->toBeTrue();
+});
+
+it('resolves action from uses key when controller key is missing', function () {
+    config(['datadog-laravel-metric.enabled' => true]);
+    config(['datadog-laravel-metric.tags.app' => 'testing-app']);
+    config(['datadog-laravel-metric.tags.env' => 'testing']);
+
+    $mockDatadog = Mockery::mock(DogStatsd::class);
+    $mockDatadog->shouldReceive('microtiming')
+        ->with(
+            'request',
+            Mockery::any(),
+            1,
+            Mockery::on(function ($tags) {
+                return $tags['action'] === 'App\\Http\\Controllers\\PostController@index';
+            })
+        )
+        ->once();
+    $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
+
+    $request = new Request;
+    $route = new Route(['GET'], '/posts', ['uses' => 'App\\Http\\Controllers\\PostController@index']);
+    $request->setRouteResolver(fn () => $route);
+
+    $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
+    $expectedResponse = new Response;
+    $response = $sampleRequestMiddleware->handle(
+        $request,
+        static function () use ($expectedResponse) {
+            return $expectedResponse;
+        }
+    );
+
+    expect($expectedResponse === $response)->toBeTrue();
+});
+
+it('resolves action as Closure when route uses a closure', function () {
+    config(['datadog-laravel-metric.enabled' => true]);
+    config(['datadog-laravel-metric.tags.app' => 'testing-app']);
+    config(['datadog-laravel-metric.tags.env' => 'testing']);
+
+    $mockDatadog = Mockery::mock(DogStatsd::class);
+    $mockDatadog->shouldReceive('microtiming')
+        ->with(
+            'request',
+            Mockery::any(),
+            1,
+            Mockery::on(function ($tags) {
+                return $tags['action'] === 'Closure';
+            })
+        )
+        ->once();
+    $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
+
+    $request = new Request;
+    $closure = function () {
+        return 'hello';
+    };
+    $route = new Route(['GET'], '/hello', ['uses' => $closure]);
+    $request->setRouteResolver(fn () => $route);
+
+    $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
+    $expectedResponse = new Response;
+    $response = $sampleRequestMiddleware->handle(
+        $request,
+        static function () use ($expectedResponse) {
+            return $expectedResponse;
+        }
+    );
+
+    expect($expectedResponse === $response)->toBeTrue();
+});
+
+it('resolves action from array syntax [Controller::class, method]', function () {
+    config(['datadog-laravel-metric.enabled' => true]);
+    config(['datadog-laravel-metric.tags.app' => 'testing-app']);
+    config(['datadog-laravel-metric.tags.env' => 'testing']);
+
+    $mockDatadog = Mockery::mock(DogStatsd::class);
+    $mockDatadog->shouldReceive('microtiming')
+        ->with(
+            'request',
+            Mockery::any(),
+            1,
+            Mockery::on(function ($tags) {
+                return $tags['action'] === 'App\\Http\\Controllers\\ApiController@store';
+            })
+        )
+        ->once();
+    $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
+
+    $request = new Request;
+    $route = new Route(['POST'], '/api/items', ['uses' => ['App\\Http\\Controllers\\ApiController', 'store']]);
+    $request->setRouteResolver(fn () => $route);
+
+    $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
+    $expectedResponse = new Response;
+    $response = $sampleRequestMiddleware->handle(
+        $request,
+        static function () use ($expectedResponse) {
+            return $expectedResponse;
+        }
+    );
+
+    expect($expectedResponse === $response)->toBeTrue();
+});
+
+it('resolves action as unknownController@unknownMethod when route has no action', function () {
+    config(['datadog-laravel-metric.enabled' => true]);
+    config(['datadog-laravel-metric.tags.app' => 'testing-app']);
+    config(['datadog-laravel-metric.tags.env' => 'testing']);
+
+    $mockDatadog = Mockery::mock(DogStatsd::class);
+    $mockDatadog->shouldReceive('microtiming')
+        ->with(
+            'request',
+            Mockery::any(),
+            1,
+            Mockery::on(function ($tags) {
+                return $tags['action'] === 'unknownController@unknownMethod';
+            })
+        )
+        ->once();
+    $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
+
+    $request = new Request;
+    $route = new Route(['GET'], '/empty', []);
+    $request->setRouteResolver(fn () => $route);
+
+    $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
+    $expectedResponse = new Response;
+    $response = $sampleRequestMiddleware->handle(
+        $request,
+        static function () use ($expectedResponse) {
+            return $expectedResponse;
+        }
+    );
+
+    expect($expectedResponse === $response)->toBeTrue();
+});
+
+it('resolves action as unknownController@unknownMethod when route is null', function () {
+    config(['datadog-laravel-metric.enabled' => true]);
+    config(['datadog-laravel-metric.tags.app' => 'testing-app']);
+    config(['datadog-laravel-metric.tags.env' => 'testing']);
+
+    $mockDatadog = Mockery::mock(DogStatsd::class);
+    $mockDatadog->shouldReceive('microtiming')
+        ->with(
+            'request',
+            Mockery::any(),
+            1,
+            Mockery::on(function ($tags) {
+                return $tags['action'] === 'unknownController@unknownMethod';
+            })
+        )
+        ->once();
+    $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
+
+    $request = new Request;
+    // No route set - route() returns null
+
+    $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
+    $expectedResponse = new Response;
+    $response = $sampleRequestMiddleware->handle(
+        $request,
+        static function () use ($expectedResponse) {
+            return $expectedResponse;
+        }
+    );
+
+    expect($expectedResponse === $response)->toBeTrue();
+});
+
+it('resolves action from invokable object', function () {
+    config(['datadog-laravel-metric.enabled' => true]);
+    config(['datadog-laravel-metric.tags.app' => 'testing-app']);
+    config(['datadog-laravel-metric.tags.env' => 'testing']);
+
+    $mockDatadog = Mockery::mock(DogStatsd::class);
+    $mockDatadog->shouldReceive('microtiming')
+        ->with(
+            'request',
+            Mockery::any(),
+            1,
+            Mockery::on(function ($tags) {
+                return $tags['action'] === 'InvokableControllerForTest@__invoke';
+            })
+        )
+        ->once();
+    $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
+
+    $request = new Request;
+    $invokable = new InvokableControllerForTest;
+    $route = new Route(['GET'], '/invokable', ['uses' => $invokable]);
+    $request->setRouteResolver(fn () => $route);
+
+    $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
+    $expectedResponse = new Response;
+    $response = $sampleRequestMiddleware->handle(
+        $request,
+        static function () use ($expectedResponse) {
+            return $expectedResponse;
+        }
+    );
+
+    expect($expectedResponse === $response)->toBeTrue();
+});
+
+it('resolves action as unknownController@unknownMethod when route has only route name', function () {
+    config(['datadog-laravel-metric.enabled' => true]);
+    config(['datadog-laravel-metric.tags.app' => 'testing-app']);
+    config(['datadog-laravel-metric.tags.env' => 'testing']);
+
+    $mockDatadog = Mockery::mock(DogStatsd::class);
+    $mockDatadog->shouldReceive('microtiming')
+        ->with(
+            'request',
+            Mockery::any(),
+            1,
+            Mockery::on(function ($tags) {
+                return $tags['action'] === 'unknownController@unknownMethod';
+            })
+        )
+        ->once();
+    $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
+
+    $request = new Request;
+    $route = new Route(['GET'], '/api/users', ['as' => 'api.users.index']);
+    $request->setRouteResolver(fn () => $route);
+
+    $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
+    $expectedResponse = new Response;
+    $response = $sampleRequestMiddleware->handle(
+        $request,
+        static function () use ($expectedResponse) {
+            return $expectedResponse;
+        }
+    );
+
+    expect($expectedResponse === $response)->toBeTrue();
+});
+
+class InvokableControllerForTest
+{
+    public function __invoke()
+    {
+        return 'invoked';
+    }
+}
 
 class TransformerForTest implements \Mamitech\DatadogLaravelMetric\TagTransformer
 {
@@ -114,9 +398,9 @@ it('transform the tag when transformer exists', function () {
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
-        new Request(),
+        new Request,
         static function () use ($expectedResponse) {
             return $expectedResponse;
         }
