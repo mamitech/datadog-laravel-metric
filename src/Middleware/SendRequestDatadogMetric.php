@@ -99,12 +99,12 @@ class SendRequestDatadogMetric
 
             // Array syntax: [Controller::class, 'method']
             if (is_array($uses) && count($uses) === 2) {
-                return $uses[0] . '@' . $uses[1];
+                return $uses[0].'@'.$uses[1];
             }
 
             // Invokable object (callable with __invoke method)
             if (is_object($uses) && method_exists($uses, '__invoke')) {
-                return get_class($uses) . '@__invoke';
+                return get_class($uses).'@__invoke';
             }
         }
 

@@ -24,10 +24,10 @@ class DatadogLaravelMetric
     /**
      * Measure the execution time of a function and send it to Datadog.
      *
-     * @param  string  $metricName - The name of the metric to send to Datadog.
-     * @param  array  $tags - The tags to send to Datadog.
-     * @param  Closure  $func - The function to execute.
-     * @param  int  $sampling - The sampling rate to send to Datadog.
+     * @param  string  $metricName  - The name of the metric to send to Datadog.
+     * @param  array  $tags  - The tags to send to Datadog.
+     * @param  Closure  $func  - The function to execute.
+     * @param  int  $sampling  - The sampling rate to send to Datadog.
      */
     public function measureFunc(string $metricName, array $tags, Closure $func, int $sampling = 1)
     {
@@ -64,10 +64,10 @@ class DatadogLaravelMetric
      * This function is better if you need the tags based on result of that doing something.
      * Example: tag the success value of a function call.
      *
-     * @param  string  $metricName - The name of the metric to send to Datadog.
-     * @param  float  $duration - The duration to send to Datadog.
-     * @param  array  $tags - The tags to send to Datadog.
-     * @param  int  $sampling - The sampling rate to send to Datadog.
+     * @param  string  $metricName  - The name of the metric to send to Datadog.
+     * @param  float  $duration  - The duration to send to Datadog.
+     * @param  array  $tags  - The tags to send to Datadog.
+     * @param  int  $sampling  - The sampling rate to send to Datadog.
      */
     public function measure(string $metricName, array $tags, float $duration, int $sampling = 1)
     {

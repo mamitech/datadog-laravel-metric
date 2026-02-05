@@ -15,9 +15,9 @@ it('sends metric data to datadog when enabled', function () {
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
-        new Request(),
+        new Request,
         static function () use ($expectedResponse) {
             return $expectedResponse;
         }
@@ -49,9 +49,9 @@ it('sends metric data to datadog and exclude tag as configured', function () {
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
-        new Request(),
+        new Request,
         static function () use ($expectedResponse) {
             return $expectedResponse;
         }
@@ -68,9 +68,9 @@ it('does not send metric data to datadog when disabled', function () {
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
-        new Request(),
+        new Request,
         static function () use ($expectedResponse) {
             return $expectedResponse;
         }
@@ -97,12 +97,12 @@ it('resolves action from controller key correctly', function () {
         ->once();
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
-    $request = new Request();
+    $request = new Request;
     $route = new Route(['GET'], '/users/{id}', ['controller' => 'App\\Http\\Controllers\\UserController@show']);
     $request->setRouteResolver(fn () => $route);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
         $request,
         static function () use ($expectedResponse) {
@@ -131,12 +131,12 @@ it('resolves action from uses key when controller key is missing', function () {
         ->once();
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
-    $request = new Request();
+    $request = new Request;
     $route = new Route(['GET'], '/posts', ['uses' => 'App\\Http\\Controllers\\PostController@index']);
     $request->setRouteResolver(fn () => $route);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
         $request,
         static function () use ($expectedResponse) {
@@ -165,7 +165,7 @@ it('resolves action as Closure when route uses a closure', function () {
         ->once();
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
-    $request = new Request();
+    $request = new Request;
     $closure = function () {
         return 'hello';
     };
@@ -173,7 +173,7 @@ it('resolves action as Closure when route uses a closure', function () {
     $request->setRouteResolver(fn () => $route);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
         $request,
         static function () use ($expectedResponse) {
@@ -202,12 +202,12 @@ it('resolves action from array syntax [Controller::class, method]', function () 
         ->once();
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
-    $request = new Request();
+    $request = new Request;
     $route = new Route(['POST'], '/api/items', ['uses' => ['App\\Http\\Controllers\\ApiController', 'store']]);
     $request->setRouteResolver(fn () => $route);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
         $request,
         static function () use ($expectedResponse) {
@@ -236,12 +236,12 @@ it('resolves action as unknownController@unknownMethod when route has no action'
         ->once();
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
-    $request = new Request();
+    $request = new Request;
     $route = new Route(['GET'], '/empty', []);
     $request->setRouteResolver(fn () => $route);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
         $request,
         static function () use ($expectedResponse) {
@@ -270,11 +270,11 @@ it('resolves action as unknownController@unknownMethod when route is null', func
         ->once();
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
-    $request = new Request();
+    $request = new Request;
     // No route set - route() returns null
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
         $request,
         static function () use ($expectedResponse) {
@@ -303,13 +303,13 @@ it('resolves action from invokable object', function () {
         ->once();
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
-    $request = new Request();
-    $invokable = new InvokableControllerForTest();
+    $request = new Request;
+    $invokable = new InvokableControllerForTest;
     $route = new Route(['GET'], '/invokable', ['uses' => $invokable]);
     $request->setRouteResolver(fn () => $route);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
         $request,
         static function () use ($expectedResponse) {
@@ -338,12 +338,12 @@ it('resolves action as unknownController@unknownMethod when route has only route
         ->once();
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
-    $request = new Request();
+    $request = new Request;
     $route = new Route(['GET'], '/api/users', ['as' => 'api.users.index']);
     $request->setRouteResolver(fn () => $route);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
         $request,
         static function () use ($expectedResponse) {
@@ -398,9 +398,9 @@ it('transform the tag when transformer exists', function () {
     $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
-    $expectedResponse = new Response();
+    $expectedResponse = new Response;
     $response = $sampleRequestMiddleware->handle(
-        new Request(),
+        new Request,
         static function () use ($expectedResponse) {
             return $expectedResponse;
         }
