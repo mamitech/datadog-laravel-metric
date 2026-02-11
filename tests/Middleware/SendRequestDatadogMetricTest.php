@@ -252,7 +252,7 @@ it('resolves action as unknownController@unknownMethod when route has no action'
     expect($expectedResponse === $response)->toBeTrue();
 });
 
-it('resolves action as unknownController@unknownMethod when route is null', function () {
+it('resolves action as response@statusCode when route is null', function () {
     config(['datadog-laravel-metric.enabled' => true]);
     config(['datadog-laravel-metric.tags.app' => 'testing-app']);
     config(['datadog-laravel-metric.tags.env' => 'testing']);
@@ -264,7 +264,7 @@ it('resolves action as unknownController@unknownMethod when route is null', func
             Mockery::any(),
             1,
             Mockery::on(function ($tags) {
-                return $tags['action'] === 'unknownController@unknownMethod';
+                return $tags['action'] === 'response@200';
             })
         )
         ->once();
@@ -275,6 +275,135 @@ it('resolves action as unknownController@unknownMethod when route is null', func
 
     $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
     $expectedResponse = new Response;
+    $response = $sampleRequestMiddleware->handle(
+        $request,
+        static function () use ($expectedResponse) {
+            return $expectedResponse;
+        }
+    );
+
+    expect($expectedResponse === $response)->toBeTrue();
+});
+
+it('resolves action as NoRouteMatched@404 when route is null and status is 404', function () {
+    config(['datadog-laravel-metric.enabled' => true]);
+    config(['datadog-laravel-metric.tags.app' => 'testing-app']);
+    config(['datadog-laravel-metric.tags.env' => 'testing']);
+
+    $mockDatadog = Mockery::mock(DogStatsd::class);
+    $mockDatadog->shouldReceive('microtiming')
+        ->with(
+            'request',
+            Mockery::any(),
+            1,
+            Mockery::on(function ($tags) {
+                return $tags['action'] === 'NoRouteMatched@404';
+            })
+        )
+        ->once();
+    $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
+
+    $request = new Request;
+    // No route set - route() returns null
+
+    $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
+    $expectedResponse = new Response('', 404);
+    $response = $sampleRequestMiddleware->handle(
+        $request,
+        static function () use ($expectedResponse) {
+            return $expectedResponse;
+        }
+    );
+
+    expect($expectedResponse === $response)->toBeTrue();
+});
+
+it('resolves action as MethodNotAllowed@405 when route is null and status is 405', function () {
+    config(['datadog-laravel-metric.enabled' => true]);
+    config(['datadog-laravel-metric.tags.app' => 'testing-app']);
+    config(['datadog-laravel-metric.tags.env' => 'testing']);
+
+    $mockDatadog = Mockery::mock(DogStatsd::class);
+    $mockDatadog->shouldReceive('microtiming')
+        ->with(
+            'request',
+            Mockery::any(),
+            1,
+            Mockery::on(function ($tags) {
+                return $tags['action'] === 'MethodNotAllowed@405';
+            })
+        )
+        ->once();
+    $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
+
+    $request = new Request;
+
+    $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
+    $expectedResponse = new Response('', 405);
+    $response = $sampleRequestMiddleware->handle(
+        $request,
+        static function () use ($expectedResponse) {
+            return $expectedResponse;
+        }
+    );
+
+    expect($expectedResponse === $response)->toBeTrue();
+});
+
+it('resolves action as ServerError@500 when route is null and status is 500', function () {
+    config(['datadog-laravel-metric.enabled' => true]);
+    config(['datadog-laravel-metric.tags.app' => 'testing-app']);
+    config(['datadog-laravel-metric.tags.env' => 'testing']);
+
+    $mockDatadog = Mockery::mock(DogStatsd::class);
+    $mockDatadog->shouldReceive('microtiming')
+        ->with(
+            'request',
+            Mockery::any(),
+            1,
+            Mockery::on(function ($tags) {
+                return $tags['action'] === 'ServerError@500';
+            })
+        )
+        ->once();
+    $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
+
+    $request = new Request;
+
+    $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
+    $expectedResponse = new Response('', 500);
+    $response = $sampleRequestMiddleware->handle(
+        $request,
+        static function () use ($expectedResponse) {
+            return $expectedResponse;
+        }
+    );
+
+    expect($expectedResponse === $response)->toBeTrue();
+});
+
+it('resolves action as MaintenanceMode@503 when route is null and status is 503', function () {
+    config(['datadog-laravel-metric.enabled' => true]);
+    config(['datadog-laravel-metric.tags.app' => 'testing-app']);
+    config(['datadog-laravel-metric.tags.env' => 'testing']);
+
+    $mockDatadog = Mockery::mock(DogStatsd::class);
+    $mockDatadog->shouldReceive('microtiming')
+        ->with(
+            'request',
+            Mockery::any(),
+            1,
+            Mockery::on(function ($tags) {
+                return $tags['action'] === 'MaintenanceMode@503';
+            })
+        )
+        ->once();
+    $datadogLaravelMetric = new DatadogLaravelMetric($mockDatadog);
+
+    $request = new Request;
+
+    $sampleRequestMiddleware = new SendRequestDatadogMetric($datadogLaravelMetric);
+    $expectedResponse = new Response('', 503);
     $response = $sampleRequestMiddleware->handle(
         $request,
         static function () use ($expectedResponse) {
@@ -320,7 +449,7 @@ it('resolves action from invokable object', function () {
     expect($expectedResponse === $response)->toBeTrue();
 });
 
-it('resolves action as unknownController@unknownMethod when route has only route name', function () {
+it('resolves action from route name when route has only route name', function () {
     config(['datadog-laravel-metric.enabled' => true]);
     config(['datadog-laravel-metric.tags.app' => 'testing-app']);
     config(['datadog-laravel-metric.tags.env' => 'testing']);
@@ -332,7 +461,7 @@ it('resolves action as unknownController@unknownMethod when route has only route
             Mockery::any(),
             1,
             Mockery::on(function ($tags) {
-                return $tags['action'] === 'unknownController@unknownMethod';
+                return $tags['action'] === 'name@api.users.index';
             })
         )
         ->once();

@@ -31,13 +31,14 @@ class SendRequestDatadogMetric
         $duration = microtime(true) - $metricStartTime;
 
         // tags get request controller name, action, and request method and status code
-        $action = $this->resolveAction($request);
+        $statusCode = $response?->getStatusCode() ?? 500;
+        $action = $this->resolveAction($request, $statusCode);
         $tags = [
             'app' => config('datadog-laravel-metric.tags.app'),
             'environment' => config('datadog-laravel-metric.tags.env'),
             'action' => $action,
             'domain' => $request->getHost(),
-            'status_code' => $response?->getStatusCode() ?? 500,
+            'status_code' => $statusCode,
         ];
 
         // exclude certain tags from being sent to datadog
@@ -68,12 +69,18 @@ class SendRequestDatadogMetric
     /**
      * Resolve the action name from the request route.
      */
-    private function resolveAction(Request $request): string
+    private function resolveAction(Request $request, int $statusCode): string
     {
         $route = $request->route();
 
         if ($route === null) {
-            return self::DEFAULT_ACTION;
+            return match ($statusCode) {
+                404 => 'NoRouteMatched@404',
+                405 => 'MethodNotAllowed@405',
+                500 => 'ServerError@500',
+                503 => 'MaintenanceMode@503',
+                default => 'response@'.$statusCode,
+            };
         }
 
         $routeAction = $route->getAction();
@@ -106,6 +113,11 @@ class SendRequestDatadogMetric
             if (is_object($uses) && method_exists($uses, '__invoke')) {
                 return get_class($uses).'@__invoke';
             }
+        }
+
+        // Case 3: Route name as fallback (e.g., Route::view(), Route::redirect())
+        if (isset($routeAction['as']) && is_string($routeAction['as'])) {
+            return 'name@'.$routeAction['as'];
         }
 
         return self::DEFAULT_ACTION;
