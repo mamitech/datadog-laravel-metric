@@ -41,7 +41,7 @@ it('sends metric data to datadog and exclude tag as configured', function () {
             [
                 'app' => 'testing-app',
                 'environment' => 'testing',
-                'action' => 'unknownController@unknownMethod',
+                'action' => 'response@200',
                 'domain' => '',
             ]
         )
@@ -518,7 +518,7 @@ it('transform the tag when transformer exists', function () {
             1,
             [
                 'app' => 'modified',
-                'action' => 'unknownController@unknownMethod',
+                'action' => 'response@200',
                 'domain' => '',
                 'status_code' => 200,
             ]
