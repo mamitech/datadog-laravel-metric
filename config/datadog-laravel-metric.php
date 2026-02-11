@@ -16,8 +16,8 @@ return [
         'metric_prefix' => env('DATADOG_METRIC_PREFIX'),
     ],
     'tags' => [
-        'app' => env('DATADOG_TAGS_APP') ?? config('app.name'),
-        'env' => env('DATADOG_TAGS_ENV') ?? config('app.env'),
+        'app' => env('DATADOG_TAGS_APP', env('APP_NAME', 'Laravel')),
+        'env' => env('DATADOG_TAGS_ENV', env('APP_ENV', 'production')),
     ],
     'middleware' => [
         'metric_name' => env('DATADOG_MIDDLEWARE_METRIC_NAME', 'request'),
