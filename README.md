@@ -10,7 +10,7 @@ Collect Laravel's request histogram data and custom metric for Datadog.
 ## Requirement
 
 -   PHP ^8.0|^8.2
--   Laravel ^10|^11|^12
+-   Laravel ^10|^11|^12|^13
 
 ## Feature
 
